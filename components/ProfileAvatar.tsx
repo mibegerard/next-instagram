@@ -60,7 +60,8 @@ function ProfileAvatar({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
 
-      <DialogContent className="dialogContent">
+      <DialogContent aria-describedby="dialog-desc" className="dialogContent">
+        <div id="dialog-desc" className="sr-only">Modification de l'avatar du profil</div>
         <DialogHeader>
           <DialogTitle className="mx-auto font-medium text-xl py-5">
             Change Profile Photo

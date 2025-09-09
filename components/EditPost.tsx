@@ -70,6 +70,7 @@ function EditPost({ id, post }: { id: string; post: Post }) {
                   src={fileUrl}
                   alt="Post preview"
                   fill
+                  sizes="100vw"
                   className="rounded-md object-cover"
                 />
               </AspectRatio>

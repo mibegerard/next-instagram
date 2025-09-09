@@ -28,7 +28,8 @@ function PostOptions({ post, userId, className }: Props) {
           )}
         />
       </DialogTrigger>
-      <DialogContent className="dialogContent">
+      <DialogContent aria-describedby="dialog-desc" className="dialogContent">
+        <div id="dialog-desc" className="sr-only">Options du post</div>
         {isPostMine && (
           <form
             action={async (formData) => {

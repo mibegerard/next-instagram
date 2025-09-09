@@ -28,6 +28,8 @@ export async function fetchPosts() {
         createdAt: "desc",
       },
     });
+    // Ajout du champ type si absent
+  return data.map(post => ({ ...(post as any), type: (post as any).type ?? "POST" }));
 
     return data;
   } catch (error) {
@@ -62,8 +64,8 @@ export async function fetchPostById(id: string) {
         user: true,
       },
     });
-
-    return data;
+    if (!data) return null;
+  return { ...(data as any), type: (data as any).type ?? "POST" };
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to fetch post");
@@ -104,8 +106,7 @@ export async function fetchPostsByUsername(username: string, postId?: string) {
         createdAt: "desc",
       },
     });
-
-    return data;
+  return data.map(post => ({ ...(post as any), type: (post as any).type ?? "POST" }));
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to fetch posts");
@@ -116,6 +117,7 @@ export async function fetchProfile(username: string) {
   noStore();
 
   try {
+    console.log("fetchProfile called with username:", username);
     const data = await prisma.user.findUnique({
       where: {
         username,
@@ -154,6 +156,9 @@ export async function fetchProfile(username: string) {
       },
     });
 
+    if (!data) {
+      console.warn("No user found for username:", username);
+    }
     return data;
   } catch (error) {
     console.error("Database Error:", error);

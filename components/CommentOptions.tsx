@@ -22,7 +22,8 @@ function CommentOptions({ comment }: Props) {
       <DialogTrigger asChild>
         <MoreHorizontal className="h-5 w-5 hidden group-hover:inline cursor-pointer dark:text-neutral-400" />
       </DialogTrigger>
-      <DialogContent className="dialogContent">
+      <DialogContent aria-describedby="dialog-desc" className="dialogContent">
+        <div id="dialog-desc" className="sr-only">Options du commentaire</div>
         <form
           action={async (formData) => {
             const { message } = await deleteComment(formData);

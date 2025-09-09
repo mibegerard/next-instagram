@@ -24,7 +24,8 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const username = params.username;
 
-  const profile = await fetchProfile(username);
+  const decodedUsername = decodeURIComponent(username);
+  const profile = await fetchProfile(decodedUsername);
 
   return {
     title: `${profile?.name} (@${profile?.username})`,

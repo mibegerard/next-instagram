@@ -32,12 +32,23 @@ async function SinglePost({ id }: { id: string }) {
     <>
       <Card className="max-w-3xl lg:max-w-4xl hidden md:flex mx-auto">
         <div className="relative overflow-hidden h-[450px] max-w-sm lg:max-w-lg w-full">
-          <Image
-            src={post.fileUrl}
-            alt="Post preview"
-            fill
-            className="md:rounded-l-md object-cover"
-          />
+          {post.type === "REEL" ? (
+            <video
+              src={post.fileUrl}
+              className="object-cover w-full h-full md:rounded-l-md"
+              controls
+              preload="metadata"
+            />
+          ) : (
+            <Image
+              src={post.fileUrl}
+              alt="Post preview"
+              fill
+              sizes="100vw"
+              priority
+              className="md:rounded-l-md object-cover"
+            />
+          )}
         </div>
 
         <div className="flex max-w-sm flex-col flex-1">
