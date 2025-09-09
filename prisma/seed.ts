@@ -22,16 +22,16 @@ async function main() {
 
   // Création des posts et récupération des IDs
   const postAlice = await prisma.post.create({
-    data: { caption: "Premier post d'Alice", fileUrl: "/public/test1.jpg", userId: alice!.id }
+    data: { caption: "Premier post d'Alice", fileUrl: "/previewtest1.png", userId: alice!.id }
   });
   const postBob = await prisma.post.create({
-    data: { caption: "Post de Bob", fileUrl: "/public/test2.jpg", userId: bob!.id }
+    data: { caption: "Post de Bob", fileUrl: "/previewtest2.png", userId: bob!.id }
   });
   const postCharlie = await prisma.post.create({
-    data: { caption: "Post de Charlie", fileUrl: "/public/test3.jpg", userId: charlie!.id }
+    data: { caption: "Post de Charlie", fileUrl: "/previewtest3.png", userId: charlie!.id }
   });
   const postDiana = await prisma.post.create({
-    data: { caption: "Post de Diana", fileUrl: "/public/test4.jpg", userId: diana!.id }
+    data: { caption: "Post de Diana", fileUrl: "/previewtest4.png", userId: diana!.id }
   });
 
   // Création de likes
