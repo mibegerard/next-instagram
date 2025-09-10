@@ -28,7 +28,11 @@ export async function GET(req: Request) {
         { receiverId: userId }
       ]
     },
-    orderBy: { createdAt: "asc" }
+    orderBy: { createdAt: "asc" },
+    include: {
+      sender: { select: { id: true, username: true, image: true } },
+      receiver: { select: { id: true, username: true, image: true } }
+    }
   });
   return NextResponse.json(messages);
 }

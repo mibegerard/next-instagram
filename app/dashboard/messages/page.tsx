@@ -2,6 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
+import { Avatar } from "@/components/ui/avatar";
 
 function MessagesPage() {
   const { data: session } = useSession();
@@ -11,6 +13,7 @@ function MessagesPage() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // On n’a plus besoin de selectedUserInfo, on extrait directement depuis les messages/conversations
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
 
@@ -28,13 +31,22 @@ function MessagesPage() {
           grouped[otherUser].push(msg);
         });
         setConversations(Object.entries(grouped));
+        // Mettre à jour les messages si une conversation est sélectionnée
+        if (selectedUser) {
+          setMessages(
+            data.filter((msg: any) =>
+              (msg.senderId === selectedUser && msg.receiverId === session.user.id) ||
+              (msg.receiverId === selectedUser && msg.senderId === session.user.id)
+            )
+          );
+        }
       } catch (e) {
         setError("Erreur lors du chargement des conversations.");
       }
       setLoading(false);
     }
     fetchConversations();
-  }, [session?.user?.id, input]);
+  }, [session?.user?.id, selectedUser]);
 
   // Pré-sélection utilisateur via paramètre
   useEffect(() => {
@@ -43,6 +55,8 @@ function MessagesPage() {
       setSelectedUser(to);
     }
   }, [searchParams, selectedUser]);
+
+  // On n’a plus besoin de ce useEffect, infos déjà dans les messages
 
   // Envoi d’un message
   const sendMessage = async () => {
@@ -79,6 +93,10 @@ function MessagesPage() {
           <ul>
             {conversations.map(([userId, msgs]) => {
               const lastMsg = msgs[msgs.length - 1];
+              // Trouver l’autre utilisateur (celui qui n’est pas moi)
+              const otherUser = msgs[0]?.sender?.id === session?.user?.id ? msgs[0]?.receiver : msgs[0]?.sender;
+              const avatar = otherUser?.image || "/alt.jpeg";
+              const username = otherUser?.username || userId;
               return (
                 <li key={userId}>
                   <button
@@ -87,12 +105,24 @@ function MessagesPage() {
                         ? "bg-blue-100 dark:bg-blue-900"
                         : "hover:bg-gray-100 dark:hover:bg-neutral-800"
                     }`}
-                    aria-label={`Ouvrir la conversation avec ${userId}`}
-                    onClick={() => setSelectedUser(userId)}
+                    aria-label={`Ouvrir la conversation avec ${username}`}
+                    onClick={() => {
+                      setSelectedUser(userId);
+                      setMessages(msgs);
+                    }}
                   >
-                    <span className="inline-block w-8 h-8 rounded-full bg-gray-300 dark:bg-neutral-700" aria-hidden="true" />
+                    <Avatar className="relative h-8 w-8">
+                      <Image
+                        src={avatar}
+                        fill
+                        alt={username}
+                        sizes="100vw"
+                        priority
+                        className="rounded-full object-cover"
+                      />
+                    </Avatar>
                     <span className="flex-1">
-                      <span className="font-semibold text-gray-800 dark:text-gray-100">{userId}</span>
+                      <span className="font-semibold text-gray-800 dark:text-gray-100">{username}</span>
                       <span className="block text-xs text-gray-500 dark:text-gray-400 truncate max-w-[120px]">{lastMsg.body}</span>
                     </span>
                     <span className="text-xs text-gray-400">{new Date(lastMsg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
@@ -109,9 +139,38 @@ function MessagesPage() {
         <div className="flex-1 p-2 sm:p-4 overflow-y-auto" tabIndex={0} aria-label="Zone de messages">
           {selectedUser ? (
             <>
-              <h3 className="font-bold mb-2 text-gray-700 dark:text-gray-100">
-                Conversation avec <span className="text-blue-600 dark:text-blue-400">{selectedUser}</span>
-              </h3>
+              {/* Trouver l’autre utilisateur dans la conversation sélectionnée */}
+              {(() => {
+                const msgs = messages.filter((msg: any) =>
+                  (msg.senderId === selectedUser && msg.receiverId === session?.user?.id) ||
+                  (msg.receiverId === selectedUser && msg.senderId === session?.user?.id)
+                );
+                const firstMsg = msgs[0];
+                const otherUser = firstMsg
+                  ? firstMsg.sender?.id === session?.user?.id
+                    ? firstMsg.receiver
+                    : firstMsg.sender
+                  : null;
+                const avatar = otherUser?.image || "/alt.jpeg";
+                const username = otherUser?.username || selectedUser;
+                return (
+                  <div className="flex items-center gap-2 mb-2">
+                    <Avatar className="relative h-8 w-8">
+                      <Image
+                        src={avatar}
+                        fill
+                        alt={username}
+                        sizes="100vw"
+                        priority
+                        className="rounded-full object-cover"
+                      />
+                    </Avatar>
+                    <h3 className="font-bold text-gray-700 dark:text-gray-100">
+                      <span className="text-blue-600 dark:text-blue-400">{username}</span>
+                    </h3>
+                  </div>
+                );
+              })()}
               {loading && <div className="text-blue-500">Chargement...</div>}
               {error && <div className="text-red-500">{error}</div>}
               <div className="space-y-2">
@@ -126,7 +185,7 @@ function MessagesPage() {
                     aria-live="polite"
                   >
                     <span className="text-xs mb-1 opacity-70">
-                      {msg.senderId === session?.user?.id ? "Moi" : "Lui"}
+                      {msg.senderId === session?.user?.id ? "Moi" : (msg.sender?.username || "Lui")}
                     </span>
                     <div className="break-words">{msg.body}</div>
                     <span className="text-[10px] mt-1 text-right opacity-60">
