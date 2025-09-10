@@ -87,7 +87,7 @@ function ProfileForm({ profile }: { profile: UserWithExtras }) {
                 </div>
                 <FormDescription className="md:ml-24 text-xs">
                   Editing your links is only available on mobile. Visit the
-                  Instagram app and edit your profile to change the websites in
+                  MyInsta app and edit your profile to change the websites in
                   your bio.
                 </FormDescription>
                 <FormMessage className="md:ml-24" />
