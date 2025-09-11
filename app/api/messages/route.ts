@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   if (!senderId || !receiverId || !body) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
-  const message = await prisma.Message.create({
+  const message = await prisma.message.create({
     data: { senderId, receiverId, body }
   });
   return NextResponse.json(message);
@@ -21,7 +21,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Missing userId" }, { status: 400 });
   }
   // Récupère toutes les conversations (groupées par utilisateur)
-  const messages = await prisma.Message.findMany({
+  const messages = await prisma.message.findMany({
     where: {
       OR: [
         { senderId: userId },

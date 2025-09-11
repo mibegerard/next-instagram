@@ -72,7 +72,6 @@ export default function NotificationsList({ initialNotifications }: { initialNot
               ${notif.isRead ? "bg-white dark:bg-gray-900" : "bg-blue-50 dark:bg-blue-900"}
               hover:bg-gray-100 dark:hover:bg-gray-800`}
             onClick={() => startTransition(() => handleClick(notif))}
-            aria-disabled={isPending}
           >
             {/* Avatar */}
             <Image
