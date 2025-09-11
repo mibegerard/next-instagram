@@ -79,6 +79,7 @@ model User {
   saved         SavedPost[]
   likes         Like[]
   comments      Comment[]
+  taggedPosts   PostTag[]
   followedBy    Follows[]   @relation("following")
   following     Follows[]   @relation("follower")
   accounts      Account[]
@@ -108,22 +109,36 @@ model Follows {
 }
 
 model Post {
-  id        String      @id @default(cuid())
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  caption   String?
-  fileUrl   String
-  type      PostType    @default(POST)
+  id          String      @id @default(cuid())
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  caption     String?
+  fileUrl     String
+  type        PostType    @default(POST)
 
-  userId    String      @map("user_id")
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String      @map("user_id")
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  likes     Like[]
-  savedBy   SavedPost[]
-  comments  Comment[]
-  notif     Notification[]
+  likes       Like[]
+  savedBy     SavedPost[]
+  comments    Comment[]
+  notif       Notification[]
+  taggedUsers PostTag[]
 
   @@index([userId])
+}
+
+model PostTag {
+  id      String   @id @default(cuid())
+  postId  String
+  userId  String
+
+  post    Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([postId])
+  // Plus de contrainte unique, pour autoriser plusieurs tags du même utilisateur
 }
 
 model SavedPost {

@@ -23,8 +23,8 @@ function BookmarkButton({ post, userId }: Props) {
     // @ts-ignore
     (state: SavedPost[], newBookmark: SavedPost) =>
       state.find(predicate)
-        ? //   here we check if the bookmark already exists, if it does, we remove it, if it doesn't, we add it
-          state.filter((bookmark) => bookmark.userId !== userId)
+        ? // On retire uniquement le bookmark de ce post pour cet utilisateur
+          state.filter((bookmark) => !(bookmark.userId === userId && bookmark.postId === post.id))
         : [...state, newBookmark]
   );
 
@@ -32,8 +32,8 @@ function BookmarkButton({ post, userId }: Props) {
     <form
       action={async (formData: FormData) => {
         const postId = formData.get("postId");
-        addOptimisticBookmark({ postId, userId });
-        await bookmarkPost(postId);
+  addOptimisticBookmark({ postId, userId });
+  await bookmarkPost({ postId: String(postId) });
       }}
       className="ml-auto"
     >
