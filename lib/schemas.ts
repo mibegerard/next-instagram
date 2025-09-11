@@ -35,7 +35,7 @@ export const UserSchema = z.object({
   image: z.string().optional(),
   bio: z.string().max(150).optional(),
   website: z.string().optional(),
-  gender: z.string().optional(),
+  email: z.string().email().optional(),
 });
 
 export const UpdateUser = UserSchema;

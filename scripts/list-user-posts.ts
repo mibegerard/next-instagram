@@ -1,7 +1,7 @@
 import prisma from "../lib/prisma";
 
 async function main() {
-  const username = "abbagérardmibekeumeni";
+  const username = "abbagerardmibekeumeni";
   const user = await prisma.user.findUnique({
     where: { username },
     include: { posts: true }

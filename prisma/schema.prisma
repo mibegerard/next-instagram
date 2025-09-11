@@ -1,12 +1,4 @@
 // -----------------------------
-// Enums
-// -----------------------------
-enum PostType {
-  POST
-  REEL
-}
-
-// -----------------------------
 // Generator & Datasource
 // -----------------------------
 generator client {
@@ -20,9 +12,16 @@ datasource db {
 }
 
 // -----------------------------
+// Enums
+// -----------------------------
+enum PostType {
+  POST
+  REEL
+}
+
+// -----------------------------
 // Models
 // -----------------------------
-
 model VerificationToken {
   id         Int      @id @default(autoincrement())
   identifier String
@@ -85,6 +84,10 @@ model User {
   accounts      Account[]
   sessions      Session[]
 
+  // Notifications
+  notificationsReceived Notification[] @relation("UserNotifications")
+  notificationsSent     Notification[] @relation("FromNotifications")
+
   // Messaging
   sentMessages     Message[] @relation("SentMessages")
   receivedMessages Message[] @relation("ReceivedMessages")
@@ -118,6 +121,7 @@ model Post {
   likes     Like[]
   savedBy   SavedPost[]
   comments  Comment[]
+  notif     Notification[]
 
   @@index([userId])
 }
@@ -171,13 +175,30 @@ model Comment {
 model Message {
   id         String   @id @default(uuid())
   senderId   String
-    receiverId String?
-    body       String
+  receiverId String?
+  body       String
   createdAt  DateTime @default(now())
 
   sender   User @relation("SentMessages", fields: [senderId], references: [id])
-    receiver User? @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  receiver User? @relation("ReceivedMessages", fields: [receiverId], references: [id])
 
   @@index([senderId])
   @@index([receiverId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String   // "LIKE", "COMMENT", "FOLLOW", "MENTION"
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  userId    String   // celui qui reçoit la notif
+  fromId    String   // celui qui déclenche la notif
+  postId    String?  // lié à un post (like/comment/mention)
+
+  user   User   @relation("UserNotifications", fields: [userId], references: [id])
+  from   User   @relation("FromNotifications", fields: [fromId], references: [id])
+  post   Post?  @relation(fields: [postId], references: [id])
 }

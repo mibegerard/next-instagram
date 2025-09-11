@@ -38,7 +38,7 @@ function ProfileForm({ profile }: { profile: UserWithExtras }) {
       name: profile.name || "",
       username: profile.username || "",
       bio: profile.bio || "",
-      gender: profile.gender || "",
+  // gender: profile.gender || "", // supprimé car non présent dans UserWithExtras
       website: profile.website || "",
     },
   });
