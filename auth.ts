@@ -63,7 +63,7 @@ export const config = {
               name: user.name ?? user.email,
               email: user.email,
               image: user.image ?? undefined,
-              username: user.username ?? user.email.split("@")[0],
+              username: user.username ?? (user.email ? user.email.split("@")[0] : "user"),
             };
           }
         }
