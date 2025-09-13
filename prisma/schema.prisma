@@ -66,6 +66,7 @@ model Session {
 model User {
   id            String      @id @default(cuid())
   name          String?
+  password      String?
   username      String?     @unique
   bio           String?
   website       String?
