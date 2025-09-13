@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { updateProfile } from "@/lib/actions";
+import { updateUser } from "@/lib/actions";
 import { UserWithExtras } from "@/lib/definitions";
 import { UserSchema } from "@/lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,7 +38,7 @@ function ProfileForm({ profile }: { profile: UserWithExtras }) {
       name: profile.name || "",
       username: profile.username || "",
       bio: profile.bio || "",
-      gender: profile.gender || "",
+  // gender: profile.gender || "", // supprimé car non présent dans UserWithExtras
       website: profile.website || "",
     },
   });
@@ -66,9 +66,13 @@ function ProfileForm({ profile }: { profile: UserWithExtras }) {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(async (values) => {
-            const { message } = await updateProfile(values);
-            toast(message);
-          })}
+          const result = await updateUser(values);
+          if ("error" in result) {
+            toast.error(result.error);
+          } else if (result.success) {
+            toast.success("Profil mis à jour avec succès !");
+          }
+        })}
           className="space-y-8"
         >
           <FormField
@@ -87,7 +91,7 @@ function ProfileForm({ profile }: { profile: UserWithExtras }) {
                 </div>
                 <FormDescription className="md:ml-24 text-xs">
                   Editing your links is only available on mobile. Visit the
-                  Instagram app and edit your profile to change the websites in
+                  MyInsta app and edit your profile to change the websites in
                   your bio.
                 </FormDescription>
                 <FormMessage className="md:ml-24" />
@@ -116,6 +120,7 @@ function ProfileForm({ profile }: { profile: UserWithExtras }) {
             )}
           />
 
+          {/*
           <FormField
             control={form.control}
             name="gender"
@@ -150,6 +155,7 @@ function ProfileForm({ profile }: { profile: UserWithExtras }) {
               </FormItem>
             )}
           />
+          */}
 
           <Button
             type="submit"

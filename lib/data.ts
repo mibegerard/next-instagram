@@ -1,6 +1,60 @@
 import { unstable_noStore as noStore } from "next/cache";
 import prisma from "./prisma";
 
+export async function fetchUserTaggedPosts(username: string) {
+  noStore();
+  try {
+    const data = await prisma.post.findMany({
+      where: {
+        taggedUsers: {
+          some: {
+            user: { username },
+          },
+        },
+      },
+      include: {
+        comments: { include: { user: true }, orderBy: { createdAt: "desc" } },
+        likes: { include: { user: true } },
+        savedBy: true,
+        user: true,
+        taggedUsers: {       // ici, inclure la relation PostTag
+          include: {
+            user: true,      // et inclure l'utilisateur tagué
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    return data.map(post => ({ ...(post as any), type: (post as any).type ?? "POST" }));
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch tagged posts");
+  }
+}
+
+export async function fetchUserReels(username: string) {
+  noStore();
+  try {
+    const data = await prisma.post.findMany({
+      where: {
+        user: { username },
+        type: "REEL",
+      },
+      include: {
+        comments: { include: { user: true }, orderBy: { createdAt: "desc" } },
+        likes: { include: { user: true } },
+        savedBy: true,
+        user: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    return data.map(post => ({ ...(post as any), type: (post as any).type ?? "REEL" }));
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch reels");
+  }
+}
+
 export async function fetchPosts() {
   // equivalent to doing fetch, cache: no-store
   noStore();
@@ -28,6 +82,8 @@ export async function fetchPosts() {
         createdAt: "desc",
       },
     });
+    // Ajout du champ type si absent
+  return data.map(post => ({ ...(post as any), type: (post as any).type ?? "POST" }));
 
     return data;
   } catch (error) {
@@ -62,8 +118,8 @@ export async function fetchPostById(id: string) {
         user: true,
       },
     });
-
-    return data;
+    if (!data) return null;
+  return { ...(data as any), type: (data as any).type ?? "POST" };
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to fetch post");
@@ -104,8 +160,7 @@ export async function fetchPostsByUsername(username: string, postId?: string) {
         createdAt: "desc",
       },
     });
-
-    return data;
+  return data.map(post => ({ ...(post as any), type: (post as any).type ?? "POST" }));
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to fetch posts");
@@ -116,6 +171,7 @@ export async function fetchProfile(username: string) {
   noStore();
 
   try {
+    console.log("fetchProfile called with username:", username);
     const data = await prisma.user.findUnique({
       where: {
         username,
@@ -154,6 +210,9 @@ export async function fetchProfile(username: string) {
       },
     });
 
+    if (!data) {
+      console.warn("No user found for username:", username);
+    }
     return data;
   } catch (error) {
     console.error("Database Error:", error);

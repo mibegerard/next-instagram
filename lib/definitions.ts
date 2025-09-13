@@ -11,6 +11,7 @@ export type CommentWithExtras = Comment & { user: User };
 export type LikeWithExtras = Like & { user: User };
 
 export type PostWithExtras = Post & {
+  type: "POST" | "REEL";
   comments: CommentWithExtras[];
   likes: LikeWithExtras[];
   savedBy: SavedPost[];

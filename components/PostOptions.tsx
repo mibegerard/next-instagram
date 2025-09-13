@@ -28,16 +28,21 @@ function PostOptions({ post, userId, className }: Props) {
           )}
         />
       </DialogTrigger>
-      <DialogContent className="dialogContent">
+      <DialogContent aria-describedby="dialog-desc" className="dialogContent">
+        <div id="dialog-desc" className="sr-only">Options du post</div>
         {isPostMine && (
           <form
-            action={async (formData) => {
-              const { message } = await deletePost(formData);
-              toast(message);
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const result = await deletePost({ id: post.id });
+              if ("error" in result) {
+                toast.error(result.error);
+              } else if (result.success) {
+                toast.success("Post supprimé avec succès");
+              }
             }}
             className="postOption"
           >
-            <input type="hidden" name="id" value={post.id} />
             <SubmitButton className="text-red-500 font-bold disabled:cursor-not-allowed w-full p-3">
               Delete post
             </SubmitButton>

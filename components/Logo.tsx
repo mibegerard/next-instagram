@@ -18,7 +18,7 @@ function Logo() {
       <p
         className={`font-semibold text-xl hidden lg:block ${calSans.className}`}
       >
-        Instagram by Gerard
+        MyInsta
       </p>
     </Link>
   );

@@ -22,15 +22,20 @@ function CommentOptions({ comment }: Props) {
       <DialogTrigger asChild>
         <MoreHorizontal className="h-5 w-5 hidden group-hover:inline cursor-pointer dark:text-neutral-400" />
       </DialogTrigger>
-      <DialogContent className="dialogContent">
+      <DialogContent aria-describedby="dialog-desc" className="dialogContent">
+        <div id="dialog-desc" className="sr-only">Options du commentaire</div>
         <form
-          action={async (formData) => {
-            const { message } = await deleteComment(formData);
-            toast(message);
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const result = await deleteComment({ id: comment.id });
+            if ("error" in result) {
+              toast.error(result.error);
+            } else if (result.success) {
+              toast.success("Commentaire supprimé avec succès");
+            }
           }}
           className="postOption"
         >
-          <input type="hidden" name="id" value={comment.id} />
           <SubmitButton className="text-red-500 font-bold disabled:cursor-not-allowed w-full p-3">
             Delete
           </SubmitButton>

@@ -5,6 +5,7 @@ import Post from "@/components/Post";
 import PostActions from "@/components/PostActions";
 import PostOptions from "@/components/PostOptions";
 import UserAvatar from "@/components/UserAvatar";
+import { CommentWithExtras } from "@/lib/definitions";
 import {
   HoverCard,
   HoverCardContent,
@@ -20,6 +21,8 @@ import MiniPost from "./MiniPost";
 
 async function SinglePost({ id }: { id: string }) {
   const post = await fetchPostById(id);
+  // Utilisation du type CommentWithExtras pour le typage des commentaires
+  const comments: CommentWithExtras[] = post.comments ?? [];
   const session = await auth();
   const postUsername = post?.user.username;
   const userId = session?.user.id;
@@ -32,12 +35,23 @@ async function SinglePost({ id }: { id: string }) {
     <>
       <Card className="max-w-3xl lg:max-w-4xl hidden md:flex mx-auto">
         <div className="relative overflow-hidden h-[450px] max-w-sm lg:max-w-lg w-full">
-          <Image
-            src={post.fileUrl}
-            alt="Post preview"
-            fill
-            className="md:rounded-l-md object-cover"
-          />
+          {post.type === "REEL" ? (
+            <video
+              src={post.fileUrl}
+              className="object-cover w-full h-full md:rounded-l-md"
+              controls
+              preload="metadata"
+            />
+          ) : (
+            <Image
+              src={post.fileUrl}
+              alt="Post preview"
+              fill
+              sizes="100vw"
+              priority
+              className="md:rounded-l-md object-cover"
+            />
+          )}
         </div>
 
         <div className="flex max-w-sm flex-col flex-1">
@@ -67,7 +81,7 @@ async function SinglePost({ id }: { id: string }) {
             <PostOptions post={post} userId={userId} />
           </div>
 
-          {post.comments.length === 0 && (
+          {comments.length === 0 && (
             <div className="flex flex-col items-center gap-1.5 flex-1 justify-center">
               <p className="text-xl lg:text-2xl font-extrabold">
                 No comments yet.
@@ -76,10 +90,10 @@ async function SinglePost({ id }: { id: string }) {
             </div>
           )}
 
-          {post.comments.length > 0 && (
+          {comments.length > 0 && (
             <ScrollArea className="hidden md:inline py-1.5 flex-1">
               <MiniPost post={post} />
-              {post.comments.map((comment) => (
+              {comments.map((comment) => (
                 <Comment key={comment.id} comment={comment} />
               ))}
             </ScrollArea>

@@ -43,12 +43,22 @@ async function Post({ post }: { post: PostWithExtras }) {
       </div>
 
       <Card className="relative h-[450px] w-full overflow-hidden rounded-none sm:rounded-md">
-        <Image
-          src={post.fileUrl}
-          alt="Post Image"
-          fill
-          className="sm:rounded-md object-cover"
-        />
+        {post.type === "REEL" ? (
+          <video
+            src={post.fileUrl}
+            className="object-cover w-full h-full sm:rounded-md"
+            controls
+            preload="metadata"
+          />
+        ) : (
+          <Image
+            src={post.fileUrl}
+            alt="Post Image"
+            fill
+            sizes="100vw"
+            className="sm:rounded-md object-cover"
+          />
+        )}
       </Card>
 
       <PostActions post={post} userId={userId} className="px-3 sm:px-0" />

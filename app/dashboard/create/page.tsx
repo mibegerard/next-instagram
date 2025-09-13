@@ -63,7 +63,13 @@ function CreatePage() {
               onSubmit={form.handleSubmit(async (values) => {
                 const res = await createPost(values);
                 if (res) {
-                  return toast.error(<Error res={res} />);
+                  // Adapter la réponse pour correspondre au type attendu par <Error />
+                  const adaptedRes =
+                    "error" in res
+                      ? { message: res.error ?? "Une erreur est survenue" }
+                      : { message: "Post created successfully" };
+
+                  return toast.error(<Error res={adaptedRes} />);
                 }
               })}
               className="space-y-4"

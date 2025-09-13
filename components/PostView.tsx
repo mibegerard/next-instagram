@@ -32,7 +32,8 @@ function PostView({ id, post }: { id: string; post: PostWithExtras }) {
 
   return (
     <Dialog open={isPostModal} onOpenChange={(open) => !open && router.back()}>
-      <DialogContent className="flex gap-0 flex-col md:flex-row items-start p-0 md:max-w-3xl lg:max-w-5xl xl:max-w-6xl h-full max-h-[500px] lg:max-h-[700px] xl:max-h-[800px]">
+      <DialogContent aria-describedby="dialog-desc" className="flex gap-0 flex-col md:flex-row items-start p-0 md:max-w-3xl lg:max-w-5xl xl:max-w-6xl h-full max-h-[500px] lg:max-h-[700px] xl:max-h-[800px]">
+        <div id="dialog-desc" className="sr-only">Vue détaillée du post</div>
         <div className="flex flex-col justify-between md:h-full md:order-2 w-full max-w-md">
           <DialogHeader className="flex border-b space-y-0 space-x-2.5 flex-row items-center py-4 pl-3.5 pr-6">
             <Link href={href}>
@@ -79,13 +80,23 @@ function PostView({ id, post }: { id: string; post: PostWithExtras }) {
         </div>
 
         <div className="relative overflow-hidden h-96 md:h-[500px] lg:h-[700px] xl:h-[800px] max-w-3xl w-full">
-          <Image
-            src={post.fileUrl}
-            fill
-            objectFit="cover"
-            alt="Post Image"
-            className="md:rounded-l-md object-cover"
-          />
+          {post.type === "REEL" ? (
+            <video
+              src={post.fileUrl}
+              className="object-cover w-full h-full md:rounded-l-md"
+              controls
+              preload="metadata"
+            />
+          ) : (
+            <Image
+              src={post.fileUrl}
+              fill
+              sizes="100vw"
+              priority
+              alt="Post Image"
+              className="md:rounded-l-md object-cover"
+            />
+          )}
         </div>
 
         <PostActions

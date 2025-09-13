@@ -60,8 +60,14 @@ function EditPost({ id, post }: { id: string; post: Post }) {
               const res = await updatePost(values);
 
               if (res) {
-                return toast.error(<Error res={res} />);
+                const adaptedRes =
+                  "error" in res
+                    ? { message: res.error ?? "Une erreur est survenue" } // 👈 fallback string
+                    : { message: "Post updated successfully" };
+
+                return toast.error(<Error res={adaptedRes} />);
               }
+
             })}
           >
             <div className="h-96 md:h-[450px] overflow-hidden rounded-md">
@@ -70,6 +76,7 @@ function EditPost({ id, post }: { id: string; post: Post }) {
                   src={fileUrl}
                   alt="Post preview"
                   fill
+                  sizes="100vw"
                   className="rounded-md object-cover"
                 />
               </AspectRatio>

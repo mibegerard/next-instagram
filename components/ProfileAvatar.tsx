@@ -12,10 +12,9 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormMessage,
 } from "@/components/ui/form";
 import useMount from "@/hooks/useMount";
-import { updateProfile } from "@/lib/actions";
+import { updateUser } from "@/lib/actions";
 import { UserWithExtras } from "@/lib/definitions";
 import { UpdateUser } from "@/lib/schemas";
 import { UploadButton } from "@/lib/uploadthing";
@@ -38,6 +37,7 @@ function ProfileAvatar({
 }) {
   const { data: session } = useSession();
   const isCurrentUser = session?.user.id === user.id;
+
   const form = useForm<z.infer<typeof UpdateUser>>({
     resolver: zodResolver(UpdateUser),
     defaultValues: {
@@ -47,6 +47,7 @@ function ProfileAvatar({
       username: user.username || "",
     },
   });
+
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const mount = useMount();
@@ -60,7 +61,10 @@ function ProfileAvatar({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
 
-      <DialogContent className="dialogContent">
+      <DialogContent aria-describedby="dialog-desc" className="dialogContent">
+        <div id="dialog-desc" className="sr-only">
+          Modification de l&#39;avatar du profil
+        </div>
         <DialogHeader>
           <DialogTitle className="mx-auto font-medium text-xl py-5">
             Change Profile Photo
@@ -71,10 +75,15 @@ function ProfileAvatar({
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(async (values) => {
-                const { message } = await updateProfile(values);
-                toast(message);
+                // Changement clé : gérer success / error au lieu de 'message'
+                const result = await updateUser(values);
 
-                setOpen(false);
+                if ("error" in result) {
+                  toast.error(result.error);
+                } else if (result.success) {
+                  toast.success("Profil mis à jour avec succès !");
+                  setOpen(false);
+                }
               })}
             >
               <FormField
